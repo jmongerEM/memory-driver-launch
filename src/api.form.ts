@@ -13,6 +13,36 @@ interface ContactFormInput {
   message: string;
 }
 
+export interface RegistrationFormInput {
+  name: string;
+  email: string;
+  country: string;
+  state: string;
+  phone?: string;
+  referralSource?: string;
+  isAmbassador: boolean;
+}
+
+export const submitRegistrationForm = createServerFn({ method: 'POST' })
+  .inputValidator((data: RegistrationFormInput) => data)
+  .handler(async ({ data }) => {
+    await db.send(new PutCommand({
+      TableName: Resource.FormData.name,
+      Item: {
+        type: 'app_user',
+        email: data.email,
+        name: data.name,
+        country: data.country,
+        state: data.state,
+        ...(data.phone != null && data.phone !== '' && { phone: data.phone }),
+        ...(data.referralSource != null && data.referralSource !== '' && { referralSource: data.referralSource }),
+        isAmbassador: data.isAmbassador ?? false,
+        createdAt: new Date().toISOString(),
+      },
+    }));
+    return { success: true };
+  });
+
 export const submitContactForm = createServerFn({ method: 'POST' })
   // Use inputValidator to clear the "Property validator does not exist" error
   .inputValidator((data: ContactFormInput) => data)

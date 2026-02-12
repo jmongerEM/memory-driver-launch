@@ -30,7 +30,7 @@ function Home() {
           </div>
           <div className="promo-cta">
             <Link
-              to="/register"
+              to="/registration"
               className="cta-button"
               aria-label="Register for MD Premier event"
             >

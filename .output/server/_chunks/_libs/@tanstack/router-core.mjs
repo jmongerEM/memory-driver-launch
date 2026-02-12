@@ -1549,6 +1549,12 @@ function isRedirect(obj) {
 function isResolvedRedirect(obj) {
   return isRedirect(obj) && !!obj.options.href;
 }
+function parseRedirect(obj) {
+  if (obj !== null && typeof obj === "object" && obj.isSerializedRedirect) {
+    return redirect(obj);
+  }
+  return void 0;
+}
 const triggerOnReady = (inner) => {
   if (!inner.rendered) {
     inner.rendered = true;
@@ -4771,9 +4777,10 @@ function transformStreamWithRouter(router, appStream, opts) {
   return stream;
 }
 export {
-  defaultSerovalPlugins as A,
+  executeRewriteInput as A,
   BaseRootRoute as B,
-  makeSerovalPlugin as C,
+  defaultSerovalPlugins as C,
+  makeSerovalPlugin as D,
   RouterCore as R,
   rootRouteId as a,
   isRedirect as b,
@@ -4789,16 +4796,16 @@ export {
   functionalUpdate as l,
   BaseRoute as m,
   isModuleNotFoundError as n,
-  getNormalizedURL as o,
-  getOrigin as p,
-  attachRouterServerSsrUtils as q,
+  mergeHeaders as o,
+  parseRedirect as p,
+  getNormalizedURL as q,
   restoreScroll as r,
   storageKey as s,
   transformReadableStreamWithRouter as t,
-  defineHandlerCallback as u,
-  createSerializationAdapter as v,
-  createRawStreamRPCPlugin as w,
-  isResolvedRedirect as x,
-  mergeHeaders as y,
-  executeRewriteInput as z
+  getOrigin as u,
+  attachRouterServerSsrUtils as v,
+  defineHandlerCallback as w,
+  createSerializationAdapter as x,
+  createRawStreamRPCPlugin as y,
+  isResolvedRedirect as z
 };
