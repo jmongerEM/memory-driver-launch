@@ -194,7 +194,7 @@ function getResponse() {
   return event.res;
 }
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest } = await import("./_tanstack-start-manifest_v-BNG_XVqd.mjs");
+  const { tsrStartManifest } = await import("./_tanstack-start-manifest_v-CHlV_Q6V.mjs");
   const startManifest = tsrStartManifest();
   const rootRoute = startManifest.routes[rootRouteId] = startManifest.routes[rootRouteId] || {};
   rootRoute.assets = rootRoute.assets || [];
@@ -763,7 +763,7 @@ let entriesPromise;
 let baseManifestPromise;
 let cachedFinalManifestPromise;
 async function loadEntries() {
-  const routerEntry = await import("./router-Breut3k2.mjs");
+  const routerEntry = await import("./router-D2oSEigm.mjs");
   const startEntry = await import("./start-HYkvq4Ni.mjs");
   return { startEntry, routerEntry };
 }

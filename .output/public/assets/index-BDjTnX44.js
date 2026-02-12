@@ -1,1 +1,0 @@
-import{j as t}from"./main-rxzQFCd9.js";function n(){return t.jsx("div",{style:{width:"100vw",height:"100vh",display:"flex",justifyContent:"center",alignItems:"center"},children:t.jsx("h1",{children:"Welcome to TanStack Start!"})})}export{n as component};

@@ -6,7 +6,7 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <html>
+    <html lang="en">
       <head>
         <HeadContent />
       </head>
