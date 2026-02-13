@@ -109,3 +109,25 @@ aws lambda add-permission --function-name memory-driver-launch-dev-MyWebServerUs
 - **Config fix:** The changes in `sst.config.ts` ensure that on every `npx sst deploy --stage dev`, both permissions are present so the 403 does not return after future deploys.
 
 **Result:** PASS — 403 resolved; GET/POST to the Function URL and to the CloudFront site succeed once both permissions exist.
+
+---
+
+## 7. Deploy 409 (StatementId already exists)
+
+If deploy fails with:
+
+```text
+ResourceConflictException: The statement id (FunctionURLInvokeAllowPublicAccess) provided already exists.
+```
+
+**Cause:** The permission was created in AWS outside Pulumi (e.g. via the one-off CLI `add-permission` above). The same statement is declared in `sst.config.ts` as `MyWebUrlInvokeFunction`. Pulumi state did not know about the existing statement, so on deploy it tried to create it again and AWS returned 409.
+
+**One-time fix (already applied):** Remove the existing statement so Pulumi can create and own it:
+
+```bash
+AWS_PROFILE=memorydriver-dev aws lambda remove-permission \
+  --function-name memory-driver-launch-dev-MyWebServerUseast1Function-bantvsxw \
+  --statement-id FunctionURLInvokeAllowPublicAccess --region us-east-1
+```
+
+Then run `npx sst deploy --stage dev` (or `npx sst deploy --dev` if that selects stage dev). Pulumi will create the permission and add it to state; subsequent deploys are idempotent.
