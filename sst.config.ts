@@ -56,7 +56,9 @@ export default $config({
       },
     });
 
-    // 3. Deploy the TanStack Start application
+    // 3. Deploy the TanStack Start application (served under base path /mdlaunch)
+    // App is built with Vite base + TanStack Router basepath = /mdlaunch. CloudFront behavior
+    // must route /mdlaunch* to this origin; no rewrites strip the prefix — prefix preserved.
     const site = new sst.aws.TanStackStart("MyWeb", {
 
       link: [table, email],

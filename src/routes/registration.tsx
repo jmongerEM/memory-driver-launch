@@ -284,7 +284,7 @@ function RegistrationPage() {
       </a>
       <header className="home-header" role="banner">
         <Link to="/" className="logo" aria-label="Memory Driver – home">
-          <img src="/logo.svg" alt="Memory Driver – Stay in the driver's seat of your memory" width="220" height="220" />
+          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Memory Driver – Stay in the driver's seat of your memory" width="220" height="220" />
         </Link>
       </header>
 

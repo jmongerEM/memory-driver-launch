@@ -5,6 +5,7 @@ import { routeTree } from './routeTree.gen'
 export function getRouter() {
   return createTanStackRouter({
     routeTree,
+    basepath: '/mdlaunch',
     defaultPreload: 'intent',
   })
 }

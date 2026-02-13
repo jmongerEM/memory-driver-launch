@@ -182,7 +182,7 @@ function AmbassadorRegisterPage() {
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <header className="home-header" role="banner">
           <Link to="/" className="logo" aria-label="Memory Driver – home">
-            <img src="/logo.svg" alt="Memory Driver" width="220" height="220" />
+            <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Memory Driver" width="220" height="220" />
           </Link>
         </header>
         <main id="main-content" role="main" className="registration-main">
@@ -238,7 +238,7 @@ function AmbassadorRegisterPage() {
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <header className="home-header" role="banner">
           <Link to="/" className="logo" aria-label="Memory Driver – home">
-            <img src="/logo.svg" alt="Memory Driver" width="220" height="220" />
+            <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Memory Driver" width="220" height="220" />
           </Link>
         </header>
         <main id="main-content" role="main" className="registration-main">
@@ -309,7 +309,7 @@ function AmbassadorRegisterPage() {
       <a href="#main-content" className="skip-link">Skip to main content</a>
       <header className="home-header" role="banner">
         <Link to="/" className="logo" aria-label="Memory Driver – home">
-          <img src="/logo.svg" alt="Memory Driver" width="220" height="220" />
+          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Memory Driver" width="220" height="220" />
         </Link>
       </header>
       <main id="main-content" role="main" className="registration-main">

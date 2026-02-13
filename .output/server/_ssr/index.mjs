@@ -433,7 +433,7 @@ function getResponse() {
   return event.res;
 }
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest } = await import("./_tanstack-start-manifest_v-B9JvWj4l.mjs");
+  const { tsrStartManifest } = await import("./_tanstack-start-manifest_v-DGa8I6w3.mjs");
   const startManifest = tsrStartManifest();
   const rootRoute = startManifest.routes[rootRouteId] = startManifest.routes[rootRouteId] || {};
   rootRoute.assets = rootRoute.assets || [];
@@ -589,10 +589,10 @@ function createMultiplexedStream(jsonStream, rawStreams) {
 }
 const manifest = { "aeaa4ac538284eb67a07f71f0c1e3545a4dcb6c514607b2d7b71dd7a08548fed": {
   functionName: "submitRegistrationForm_createServerFn_handler",
-  importer: () => import("./api.form-Cb8neQWk.mjs")
+  importer: () => import("./api.form-CX9Hxedw.mjs")
 }, "c6fbb1fe93e24f01bb3bb6ce2161e91912b6107b6295a0ae4df2ef131c96b08c": {
   functionName: "submitAmbassadorRegistrationForm_createServerFn_handler",
-  importer: () => import("./api.form-Cb8neQWk.mjs")
+  importer: () => import("./api.form-CX9Hxedw.mjs")
 } };
 async function getServerFnById(id) {
   const serverFnInfo = manifest[id];
@@ -1008,7 +1008,7 @@ let entriesPromise;
 let baseManifestPromise;
 let cachedFinalManifestPromise;
 async function loadEntries() {
-  const routerEntry = await import("./router-BZMPmHcg.mjs").then((n) => n.r);
+  const routerEntry = await import("./router-DySdhnIg.mjs").then((n) => n.r);
   const startEntry = await import("./start-HYkvq4Ni.mjs");
   return { startEntry, routerEntry };
 }
@@ -1037,8 +1037,8 @@ async function resolveManifest(matchedRoutes, transformFn, cache) {
   }
   return computeFinalManifest();
 }
-const ROUTER_BASEPATH = "/";
-const SERVER_FN_BASE = "/_serverFn/";
+const ROUTER_BASEPATH = "mdlaunch";
+const SERVER_FN_BASE = "/mdlaunch/_serverFn/";
 const IS_PRERENDERING = process.env.TSS_PRERENDERING === "true";
 const IS_SHELL_ENV = process.env.TSS_SHELL === "true";
 const ERR_NO_RESPONSE = "Internal Server Error";

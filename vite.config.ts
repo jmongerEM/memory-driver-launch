@@ -4,6 +4,7 @@ import { nitro } from 'nitro/vite';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
+  base: '/mdlaunch/',
   plugins: [
     tsconfigPaths(),
     tanstackStart({

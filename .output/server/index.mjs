@@ -103,11 +103,11 @@ const findRouteRules = /* @__PURE__ */ (() => {
     return r;
   };
 })();
-const _lazy_VYIMaa = defineLazyEventHandler(() => Promise.resolve().then(function() {
+const _lazy_9ZcT3s = defineLazyEventHandler(() => Promise.resolve().then(function() {
   return ssrRenderer$1;
 }));
 const findRoute = /* @__PURE__ */ (() => {
-  const data = { route: "/**", handler: _lazy_VYIMaa };
+  const data = { route: "/**", handler: _lazy_9ZcT3s };
   return ((_m, p) => {
     return { data, params: { "_": p.slice(1) } };
   });
