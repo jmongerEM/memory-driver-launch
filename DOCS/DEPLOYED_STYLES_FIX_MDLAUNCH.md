@@ -85,3 +85,11 @@ So the issue was **routing** (behavior/origin), not base path, double prefix, or
 - [x] Final mapping: `/mdlaunch/assets/*` → S3 origin; `/mdlaunch/*` (HTML) → Lambda origin.
 
 **Note:** On the very first deploy (no assets bucket yet), the bucket lookup can be empty; the next deploy will add the S3 origin and behaviors so styles work from then on.
+
+---
+
+## logo.svg (and root public files) 404 — Fix
+
+Same S3 bucket stores root-level public files at keys `logo.svg`, `logo.png`, `vite.svg` (no `mdlaunch/` or `assets/` prefix). The app requests `/mdlaunch/logo.svg` (from `BASE_URL + "logo.svg"`). That path hit the default behavior (Lambda) and returned 404.
+
+**Fix:** In `sst.config.ts`: (1) Viewer-request injection rewrites `/mdlaunch/logo.svg` → `/logo.svg`, and same for `logo.png`, `vite.svg`. (2) Ordered cache behaviors for `/logo.svg`, `/logo.png`, `/vite.svg` route those paths to the S3 origin (MyWebAssets). After rewrite, `/logo.svg` is served from S3 key `logo.svg` with `content-type: image/svg+xml`.

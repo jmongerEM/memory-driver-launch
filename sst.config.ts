@@ -74,23 +74,32 @@ export default $config({
             },
           ];
           const existingBehaviors = (args as any).orderedCacheBehaviors ?? [];
+          const s3Behavior = (pathPattern: string) => ({
+            pathPattern,
+            targetOriginId: "MyWebAssets",
+            allowedMethods: ["GET", "HEAD", "OPTIONS"],
+            cachedMethods: ["GET", "HEAD"],
+            compress: true,
+            viewerProtocolPolicy: "redirect-to-https",
+            cachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6",
+          });
           (args as any).orderedCacheBehaviors = [
-            {
-              pathPattern: "/assets/*",
-              targetOriginId: "MyWebAssets",
-              allowedMethods: ["GET", "HEAD", "OPTIONS"],
-              cachedMethods: ["GET", "HEAD"],
-              compress: true,
-              viewerProtocolPolicy: "redirect-to-https",
-              cachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6",
-            },
+            s3Behavior("/logo.svg"),
+            s3Behavior("/logo.png"),
+            s3Behavior("/vite.svg"),
+            s3Behavior("/assets/*"),
             ...existingBehaviors,
           ];
         },
       },
       edge: {
         viewerRequest: {
-          injection: `if (event.request.uri && event.request.uri.startsWith("/mdlaunch/assets/")) { event.request.uri = "/assets/" + event.request.uri.slice("/mdlaunch/assets/".length); }`,
+          injection: [
+            `if (event.request.uri && event.request.uri.startsWith("/mdlaunch/assets/")) { event.request.uri = "/assets/" + event.request.uri.slice("/mdlaunch/assets/".length); }`,
+            `if (event.request.uri === "/mdlaunch/logo.svg") { event.request.uri = "/logo.svg"; }`,
+            `if (event.request.uri === "/mdlaunch/logo.png") { event.request.uri = "/logo.png"; }`,
+            `if (event.request.uri === "/mdlaunch/vite.svg") { event.request.uri = "/vite.svg"; }`,
+          ].join(" "),
         },
       },
     });
