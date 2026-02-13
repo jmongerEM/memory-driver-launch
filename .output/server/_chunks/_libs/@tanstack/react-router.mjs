@@ -1472,5 +1472,6 @@ export {
   createFileRoute as b,
   createRouter as c,
   lazyRouteComponent as l,
-  renderRouterToStream as r
+  renderRouterToStream as r,
+  useNavigate as u
 };

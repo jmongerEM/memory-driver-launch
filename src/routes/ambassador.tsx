@@ -1,15 +1,9 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/ambassador')({
-  component: AmbassadorPlaceholder,
+  component: AmbassadorLayout,
 })
 
-function AmbassadorPlaceholder() {
-  return (
-    <div style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
-      <h1>Ambassador Program</h1>
-      <p>Ambassador sign-up form will be implemented here.</p>
-      <Link to="/">← Back to home</Link>
-    </div>
-  )
+function AmbassadorLayout() {
+  return <Outlet />
 }

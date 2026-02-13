@@ -1,5 +1,5 @@
 {
-  "date": "2026-02-12T22:28:40.588Z",
+  "date": "2026-02-13T04:06:20.033Z",
   "preset": "aws-lambda",
   "framework": {
     "name": "nitro",
@@ -11,7 +11,7 @@
   "commands": {},
   "config": {
     "awsLambda": {
-      "streaming": false
+      "streaming": true
     }
   }
 }

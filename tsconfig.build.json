@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["src", "vite.config.ts", "sst-env.d.ts"],
+  "exclude": [".sst", "node_modules"]
+}

@@ -13,6 +13,7 @@ import { Route as RegistrationRouteImport } from './routes/registration'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as AmbassadorRouteImport } from './routes/ambassador'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AmbassadorRegisterRouteImport } from './routes/ambassador.register'
 
 const RegistrationRoute = RegistrationRouteImport.update({
   id: '/registration',
@@ -34,37 +35,61 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AmbassadorRegisterRoute = AmbassadorRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => AmbassadorRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/ambassador': typeof AmbassadorRoute
+  '/ambassador': typeof AmbassadorRouteWithChildren
   '/register': typeof RegisterRoute
   '/registration': typeof RegistrationRoute
+  '/ambassador/register': typeof AmbassadorRegisterRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/ambassador': typeof AmbassadorRoute
+  '/ambassador': typeof AmbassadorRouteWithChildren
   '/register': typeof RegisterRoute
   '/registration': typeof RegistrationRoute
+  '/ambassador/register': typeof AmbassadorRegisterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/ambassador': typeof AmbassadorRoute
+  '/ambassador': typeof AmbassadorRouteWithChildren
   '/register': typeof RegisterRoute
   '/registration': typeof RegistrationRoute
+  '/ambassador/register': typeof AmbassadorRegisterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/ambassador' | '/register' | '/registration'
+  fullPaths:
+    | '/'
+    | '/ambassador'
+    | '/register'
+    | '/registration'
+    | '/ambassador/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/ambassador' | '/register' | '/registration'
-  id: '__root__' | '/' | '/ambassador' | '/register' | '/registration'
+  to:
+    | '/'
+    | '/ambassador'
+    | '/register'
+    | '/registration'
+    | '/ambassador/register'
+  id:
+    | '__root__'
+    | '/'
+    | '/ambassador'
+    | '/register'
+    | '/registration'
+    | '/ambassador/register'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AmbassadorRoute: typeof AmbassadorRoute
+  AmbassadorRoute: typeof AmbassadorRouteWithChildren
   RegisterRoute: typeof RegisterRoute
   RegistrationRoute: typeof RegistrationRoute
 }
@@ -99,12 +124,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ambassador/register': {
+      id: '/ambassador/register'
+      path: '/register'
+      fullPath: '/ambassador/register'
+      preLoaderRoute: typeof AmbassadorRegisterRouteImport
+      parentRoute: typeof AmbassadorRoute
+    }
   }
 }
 
+interface AmbassadorRouteChildren {
+  AmbassadorRegisterRoute: typeof AmbassadorRegisterRoute
+}
+
+const AmbassadorRouteChildren: AmbassadorRouteChildren = {
+  AmbassadorRegisterRoute: AmbassadorRegisterRoute,
+}
+
+const AmbassadorRouteWithChildren = AmbassadorRoute._addFileChildren(
+  AmbassadorRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AmbassadorRoute: AmbassadorRoute,
+  AmbassadorRoute: AmbassadorRouteWithChildren,
   RegisterRoute: RegisterRoute,
   RegistrationRoute: RegistrationRoute,
 }

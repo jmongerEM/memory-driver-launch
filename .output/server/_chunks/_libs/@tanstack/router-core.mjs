@@ -4781,6 +4781,7 @@ export {
   BaseRootRoute as B,
   defaultSerovalPlugins as C,
   makeSerovalPlugin as D,
+  redirect as E,
   RouterCore as R,
   rootRouteId as a,
   isRedirect as b,

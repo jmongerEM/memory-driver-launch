@@ -13,7 +13,7 @@ function Home() {
       </a>
       <header className="home-header" role="banner">
         <Link to="/" className="logo" aria-label="Memory Driver – home">
-          <img src="/logo.png" alt="Memory Driver – Stay in the driver's seat of your memory" width="220" height="220" />
+          <img src="/logo.svg" alt="Memory Driver – Stay in the driver's seat of your memory" width="220" height="220" />
         </Link>
       </header>
 
@@ -52,7 +52,8 @@ function Home() {
           </div>
           <div className="promo-cta">
             <Link
-              to="/ambassador"
+              to="/ambassador/register"
+              search={{ step: 1 }}
               className="cta-button"
               aria-label="Sign up for the Ambassador Program"
             >

@@ -1,6 +1,6 @@
 globalThis.__nitro_main__ = import.meta.url;
 import { s as stringifyQuery } from "./_libs/ufo.mjs";
-import { d as defineLazyEventHandler, H as H3Core, a as HTTPResponse } from "./_libs/h3.mjs";
+import { d as defineLazyEventHandler, H as H3Core, a as HTTPError, t as toRequest } from "./_libs/h3.mjs";
 import { a as NodeResponse } from "./_libs/srvx.mjs";
 import "./_libs/rou3.mjs";
 import "node:stream";
@@ -103,11 +103,11 @@ const findRouteRules = /* @__PURE__ */ (() => {
     return r;
   };
 })();
-const _lazy_iK43wT = defineLazyEventHandler(() => Promise.resolve().then(function() {
-  return rendererTemplate;
+const _lazy_VYIMaa = defineLazyEventHandler(() => Promise.resolve().then(function() {
+  return ssrRenderer$1;
 }));
 const findRoute = /* @__PURE__ */ (() => {
-  const data = { route: "/**", handler: _lazy_iK43wT };
+  const data = { route: "/**", handler: _lazy_VYIMaa };
   return ((_m, p) => {
     return { data, params: { "_": p.slice(1) } };
   });
@@ -300,53 +300,46 @@ function awsResponseHeaders(response) {
     multiValueHeaders: { "set-cookie": cookies }
   } : { headers: headers2 };
 }
-async function awsResponseBody(response) {
-  if (!response.body) {
-    return { body: "" };
-  }
-  const buffer = await toBuffer(response.body);
-  const contentType = response.headers.get("content-type") || "";
-  return isTextType(contentType) ? { body: buffer.toString("utf8") } : {
-    body: buffer.toString("base64"),
-    isBase64Encoded: true
-  };
-}
-function isTextType(contentType = "") {
-  return /^text\/|\/(javascript|json|xml)|utf-?8/i.test(contentType);
-}
-function toBuffer(data) {
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-    data.pipeTo(new WritableStream({
-      write(chunk) {
-        chunks.push(chunk);
-      },
-      close() {
-        resolve(Buffer.concat(chunks));
-      },
-      abort(reason) {
-        reject(reason);
-      }
-    })).catch(reject);
-  });
-}
 const nitroApp = useNitroApp();
-async function handler(event, context) {
+const handler = awslambda.streamifyResponse(async (event, responseStream, context) => {
   const request = awsRequest(event, context);
   const response = await nitroApp.fetch(request);
-  return {
+  response.headers.set("transfer-encoding", "chunked");
+  const httpResponseMetadata = {
     statusCode: response.status,
-    ...awsResponseHeaders(response),
-    ...await awsResponseBody(response)
+    ...awsResponseHeaders(response)
   };
+  const body = response.body ?? new ReadableStream({ start(controller) {
+    controller.enqueue("");
+    controller.close();
+  } });
+  const writer = awslambda.HttpResponseStream.from(responseStream, httpResponseMetadata);
+  const reader = body.getReader();
+  await streamToNodeStream(reader, responseStream);
+  writer.end();
+});
+async function streamToNodeStream(reader, writer) {
+  let readResult = await reader.read();
+  while (!readResult.done) {
+    writer.write(readResult.value);
+    readResult = await reader.read();
+  }
+  writer.end();
 }
-const rendererTemplate$1 = () => new HTTPResponse('<!doctype html>\n<html lang="en">\n  <head>\n    <meta charset="UTF-8" />\n    <link rel="icon" type="image/svg+xml" href="/vite.svg" />\n    <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n    <title>memory-driver-launch</title>\n  </head>\n  <body>\n    <div id="root"></div>\n\n  </body>\n</html>\n', { headers: { "content-type": "text/html; charset=utf-8" } });
-function renderIndexHTML(event) {
-  return rendererTemplate$1(event.req);
+function fetchViteEnv(viteEnvName, input, init) {
+  const envs = globalThis.__nitro_vite_envs__ || {};
+  const viteEnv = envs[viteEnvName];
+  if (!viteEnv) {
+    throw HTTPError.status(404);
+  }
+  return Promise.resolve(viteEnv.fetch(toRequest(input, init)));
 }
-const rendererTemplate = /* @__PURE__ */ Object.freeze({
+function ssrRenderer({ req }) {
+  return fetchViteEnv("ssr", req);
+}
+const ssrRenderer$1 = /* @__PURE__ */ Object.freeze({
   __proto__: null,
-  default: renderIndexHTML
+  default: ssrRenderer
 });
 export {
   handler

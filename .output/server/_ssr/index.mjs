@@ -433,7 +433,7 @@ function getResponse() {
   return event.res;
 }
 async function getStartManifest(matchedRoutes) {
-  const { tsrStartManifest } = await import("./_tanstack-start-manifest_v-BySWkeNw.mjs");
+  const { tsrStartManifest } = await import("./_tanstack-start-manifest_v-B9JvWj4l.mjs");
   const startManifest = tsrStartManifest();
   const rootRoute = startManifest.routes[rootRouteId] = startManifest.routes[rootRouteId] || {};
   rootRoute.assets = rootRoute.assets || [];
@@ -589,10 +589,10 @@ function createMultiplexedStream(jsonStream, rawStreams) {
 }
 const manifest = { "aeaa4ac538284eb67a07f71f0c1e3545a4dcb6c514607b2d7b71dd7a08548fed": {
   functionName: "submitRegistrationForm_createServerFn_handler",
-  importer: () => import("./api.form-D0cbb2lh.mjs")
-}, "6b8deb6e448c909232ecd025e2746b1e4022f4ccbd540ae0291a66e85cdcdc7f": {
-  functionName: "submitContactForm_createServerFn_handler",
-  importer: () => import("./api.form-D0cbb2lh.mjs")
+  importer: () => import("./api.form-Cb8neQWk.mjs")
+}, "c6fbb1fe93e24f01bb3bb6ce2161e91912b6107b6295a0ae4df2ef131c96b08c": {
+  functionName: "submitAmbassadorRegistrationForm_createServerFn_handler",
+  importer: () => import("./api.form-Cb8neQWk.mjs")
 } };
 async function getServerFnById(id) {
   const serverFnInfo = manifest[id];
@@ -1008,7 +1008,7 @@ let entriesPromise;
 let baseManifestPromise;
 let cachedFinalManifestPromise;
 async function loadEntries() {
-  const routerEntry = await import("./router-DWTSXc4N.mjs");
+  const routerEntry = await import("./router-BZMPmHcg.mjs").then((n) => n.r);
   const startEntry = await import("./start-HYkvq4Ni.mjs");
   return { startEntry, routerEntry };
 }
@@ -1372,9 +1372,9 @@ async function handleServerRoutes({
       }
     }
   }
-  const server2 = foundRoute?.options.server;
-  if (server2?.handlers && isExactMatch) {
-    const handlers = typeof server2.handlers === "function" ? server2.handlers({ createHandlers: (d) => d }) : server2.handlers;
+  const server = foundRoute?.options.server;
+  if (server?.handlers && isExactMatch) {
+    const handlers = typeof server.handlers === "function" ? server.handlers({ createHandlers: (d) => d }) : server.handlers;
     const requestMethod = request.method.toUpperCase();
     const handler = handlers[requestMethod] ?? handlers["ANY"];
     if (handler) {
@@ -1413,11 +1413,11 @@ function createServerEntry(entry) {
     }
   };
 }
-const server = createServerEntry({ fetch });
+const entryServer = createServerEntry({ fetch });
 export {
   TSS_SERVER_FUNCTION as T,
   createServerFn as c,
   createServerEntry,
-  server as default,
+  entryServer as default,
   getServerFnById as g
 };
