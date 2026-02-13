@@ -9,80 +9,67 @@ export default $config({
       home: "aws",
       providers: {
         aws: {
-          profile: "memorydriver-dev"
+          profile: "memorydriver-dev",
+          region: "us-east-1"
         }
       }
     };
   },
   async run() {
-    // This global transform intercepts all Function creations (including the TanStack server)
-    // It bypasses the strict TypeScript interfaces of the high-level components.
-    // 1. Force the creation of the Function URL on all functions
-    $transform(sst.aws.Function, (args) => {
-      args.url = true;
-    });
-
-    // 2. Intercept the Permission resource to add the missing InvokeFunction statement
-    // This fixes the 403 Forbidden by allowing public access to the function code itself.
-    $transform(aws.lambda.Permission, (args, opts, name) => {
-      // SST names the URL permission resource containing "URLInvokePermission"
-      if (name.includes("URLInvokePermission")) {
-        new aws.lambda.Permission(`${name}InvokeFunction`, {
-          action: "lambda:InvokeFunction",
-          function: args.function,
-          principal: "*",
-          functionUrlAuthType: "NONE",
-        }, { parent: opts.parent });
-      }
-    });
-
-    // 1. Create the DynamoDB Table (composite key: pk + sk; TTL for rate-limit cleanup)
     const table = new sst.aws.Dynamo("FormData", {
-      fields: {
-        pk: "string",
-        sk: "string",
-      },
+      fields: { pk: "string", sk: "string" },
       primaryIndex: { hashKey: "pk", rangeKey: "sk" },
       ttl: "expireAt",
     });
 
-    // 2. Setup SES Email with Import to avoid AlreadyExistsException
     const email = new sst.aws.Email("MyEmail", {
       sender: "jmonger@evonmedics.org",
       transform: {
-        identity: (_, opts) => {
-          opts.import = "jmonger@evonmedics.org";
-        },
+        identity: (_, opts) => { opts.import = "jmonger@evonmedics.org"; },
       },
     });
 
-    // 3. Deploy the TanStack Start application (served under base path /mdlaunch)
-    // App is built with Vite base + TanStack Router basepath = /mdlaunch. CloudFront behavior
-    // must route /mdlaunch* to this origin; no rewrites strip the prefix — prefix preserved.
     const site = new sst.aws.TanStackStart("MyWeb", {
-
       link: [table, email],
-      // Set to 'none' to allow public access via CloudFront/Function URL
-      environment: {
-        // This forces SST to see a 'change' and re-run the build callback
-        DEPLOY_TIMESTAMP: Date.now().toString(),
-      },
+      environment: { DEPLOY_TIMESTAMP: Date.now().toString() },
       protection: "none",
       transform: {
+        server: (args) => {
+          args.url = { authorization: "none" };
+        },
         cdn: (args) => {
-          // AWS Managed Policy: AllViewerExceptHostHeader (ID: b689...)
-          // This prevents the 403 error by ensuring Lambda doesn't see the CloudFront Host header
-          if (args.defaultCacheBehavior && typeof args.defaultCacheBehavior === "object") {
-            (args.defaultCacheBehavior as any).originRequestPolicyId =
-              "b689b0a8-53d0-40ab-baf2-68738e2966ac";
+          if (args.defaultCacheBehavior) {
+            (args.defaultCacheBehavior as any).originRequestPolicyId = "b689b0a8-53d0-40ab-baf2-68738e2966ac";
           }
         },
       },
     });
 
+    // Keep InvokeFunctionUrl permission as-is; only ensure principal is public when auth is NONE.
+    $transform(aws.lambda.Permission, (args) => {
+      if (args.functionUrlAuthType === "NONE" && args.action === "lambda:InvokeFunctionUrl") {
+        args.principal = "*";
+      }
+    });
+
+    // AWS requires BOTH lambda:InvokeFunctionUrl AND lambda:InvokeFunction (with InvokedViaFunctionUrl)
+    // for Function URLs since Oct 2025. The component only creates InvokeFunctionUrl; add the second.
+    const server = (site as { nodes?: { server?: { name: unknown } } }).nodes?.server;
+    if (server) {
+      new aws.lambda.Permission("MyWebUrlInvokeFunction", {
+        statementId: "FunctionURLInvokeAllowPublicAccess",
+        action: "lambda:InvokeFunction",
+        function: server.name,
+        principal: "*",
+        invokedViaFunctionUrl: true,
+      } as aws.lambda.PermissionArgs);
+    }
+
+    // FIX FOR TS 2339: Access the property safely via .apply() if needed for logging
+    // However, for the return block, it is best to keep it simple.
     return {
       tableName: table.name,
-      siteUrl: site.url,
+      siteUrl: site.url, // This is the CloudFront URL
     };
   },
 });
