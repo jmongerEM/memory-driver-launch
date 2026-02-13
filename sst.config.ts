@@ -16,6 +16,20 @@ export default $config({
     };
   },
   async run() {
+    const { execSync } = await import("node:child_process");
+    // Resolve assets bucket domain so /mdlaunch/assets/* can be routed to S3 (avoids referencing site before init in cdn transform).
+    let assetsBucketDomain: string | null = null;
+    try {
+      const out = execSync(
+        `aws s3api list-buckets --query "Buckets[?starts_with(Name, 'memory-driver-launch-') && contains(Name, 'mywebassetsbucket')].Name" --output text`,
+        { encoding: "utf-8", env: { ...process.env, AWS_PROFILE: "memorydriver-dev" } }
+      );
+      const name = out.trim().split(/\s+/)[0];
+      if (name) assetsBucketDomain = `${name}.s3.us-east-1.amazonaws.com`;
+    } catch {
+      // First deploy or bucket not created yet; next deploy will add S3 origin.
+    }
+
     const table = new sst.aws.Dynamo("FormData", {
       fields: { pk: "string", sk: "string" },
       primaryIndex: { hashKey: "pk", rangeKey: "sk" },
@@ -27,6 +41,14 @@ export default $config({
       transform: {
         identity: (_, opts) => { opts.import = "jmonger@evonmedics.org"; },
       },
+    });
+
+    // Origin Access Control so CloudFront can access the assets S3 bucket.
+    const assetsOac = new aws.cloudfront.OriginAccessControl("MyWebAssetsOAC", {
+      name: "MyWebAssetsOAC",
+      originAccessControlOriginType: "s3",
+      signingBehavior: "always",
+      signingProtocol: "sigv4",
     });
 
     const site = new sst.aws.TanStackStart("MyWeb", {
@@ -41,6 +63,34 @@ export default $config({
           if (args.defaultCacheBehavior) {
             (args.defaultCacheBehavior as any).originRequestPolicyId = "b689b0a8-53d0-40ab-baf2-68738e2966ac";
           }
+          if (!assetsBucketDomain || !(args as any).origins) return;
+          const existingOrigins = Array.isArray((args as any).origins) ? (args as any).origins : [(args as any).origins];
+          (args as any).origins = [
+            ...existingOrigins,
+            {
+              domainName: assetsBucketDomain,
+              originAccessControlId: assetsOac.id,
+              originId: "MyWebAssets",
+            },
+          ];
+          const existingBehaviors = (args as any).orderedCacheBehaviors ?? [];
+          (args as any).orderedCacheBehaviors = [
+            {
+              pathPattern: "/assets/*",
+              targetOriginId: "MyWebAssets",
+              allowedMethods: ["GET", "HEAD", "OPTIONS"],
+              cachedMethods: ["GET", "HEAD"],
+              compress: true,
+              viewerProtocolPolicy: "redirect-to-https",
+              cachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6",
+            },
+            ...existingBehaviors,
+          ];
+        },
+      },
+      edge: {
+        viewerRequest: {
+          injection: `if (event.request.uri && event.request.uri.startsWith("/mdlaunch/assets/")) { event.request.uri = "/assets/" + event.request.uri.slice("/mdlaunch/assets/".length); }`,
         },
       },
     });
