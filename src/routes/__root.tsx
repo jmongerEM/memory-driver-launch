@@ -10,9 +10,19 @@ function NotFoundComponent() {
   )
 }
 
+const baseUrl = typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL != null ? import.meta.env.BASE_URL : '/'
+
 export const Route = createRootRoute({
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
+  head: () => ({
+    meta: [
+      { title: 'Memory Driver Launch' },
+    ],
+    links: [
+      { rel: 'icon', type: 'image/svg+xml', href: `${baseUrl.replace(/\/?$/, '/')}logo.svg` },
+    ],
+  }),
 })
 
 function RootComponent() {
