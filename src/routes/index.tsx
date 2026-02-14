@@ -22,11 +22,15 @@ function Home() {
           className="promo-section"
           aria-labelledby="premier-heading"
         >
-          <div className="promo-card">
-            <h3 id="premier-heading">Memory Driver Premier</h3>
-            <p>
-              The next-generation brain training event. Join us and stay in the driver's seat of your memory.
-            </p>
+          <div className="promo-image-slot">
+            <h3 id="premier-heading" className="promo-image-title">Memory Driver Premier</h3>
+            <img
+              src={`${import.meta.env.BASE_URL}premier_card_image.png`}
+              alt="Memory Driver Premier – The next-generation brain training event. Stay in the driver's seat of your memory."
+              className="premier-card-image"
+              width="480"
+              height="320"
+            />
           </div>
           <div className="promo-cta">
             <Link
@@ -40,15 +44,18 @@ function Home() {
         </section>
 
         <section
-          className="promo-section"
+          className="promo-section promo-section-ambassador"
           aria-labelledby="ambassador-heading"
         >
-          <div className="promo-card">
-            <h3 id="ambassador-heading">Ambassador Program</h3>
-            <p>
-              Join the Evon Medics Ambassador Program and help spread the word about Memory Driver.
-              Connect with a community of advocates and grow with us.
-            </p>
+          <div className="promo-image-slot">
+            <h3 id="ambassador-heading" className="promo-image-title">Memory Driver Ambassador</h3>
+            <img
+              src={`${import.meta.env.BASE_URL}ambassador_card_image.png`}
+              alt="Ambassador Program – Join the Evon Medics Ambassador Program and sign up for Memory Driver"
+              className="ambassador-card-image"
+              width="480"
+              height="320"
+            />
           </div>
           <div className="promo-cta">
             <Link

@@ -20,9 +20,14 @@ function AmbassadorSuccessPage() {
 
       <main id="main-content" role="main" className="registration-main">
         <div className="registration-inner">
+          <h1 className="registration-title">Confirmation</h1>
           <div className="registration-success">
-            <h2>Registration Successful!</h2>
-            <p>Thank you for registering for the Ambassador Program. We have received your information and will be in touch soon.</p>
+            <span className="registration-success-icon" aria-hidden="true">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="">
+                <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </span>
+            <p className="registration-success-message">Thank you for registering for the Ambassador Program. We have received your information and will be in touch soon.</p>
             <Link to="/" className="registration-back-link">
               Return to home
             </Link>

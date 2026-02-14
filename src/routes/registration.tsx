@@ -146,12 +146,8 @@ function RegistrationPage() {
 
   const formContent = (
     <>
-      <p className="registration-instructions">
-        Complete the form below to register. Fields marked with an asterisk (*) are required. 
-        Enter your name, email, country, and state; add phone and how you heard about us if you like. 
-        Check “Become an Ambassador” if you want to join the Ambassador Program. When finished, click Register.
-      </p>
-
+      <h1 className="registration-title">Registration</h1>
+      <p className="registration-instructions">Register for Memory Driver Premier. Complete the form below.</p>
       <form className="registration-form" onSubmit={handleSubmit} noValidate>
         {submitError && (
           <div className="registration-form-error" role="alert">

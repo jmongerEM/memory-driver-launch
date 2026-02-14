@@ -87,6 +87,8 @@ export default $config({
             s3Behavior("/logo.svg"),
             s3Behavior("/logo.png"),
             s3Behavior("/vite.svg"),
+            s3Behavior("/ambassador_card_image.png"),
+            s3Behavior("/premier_card_image.png"),
             s3Behavior("/assets/*"),
             ...existingBehaviors,
           ];
@@ -99,6 +101,8 @@ export default $config({
             `if (event.request.uri === "/mdlaunch/logo.svg") { event.request.uri = "/logo.svg"; }`,
             `if (event.request.uri === "/mdlaunch/logo.png") { event.request.uri = "/logo.png"; }`,
             `if (event.request.uri === "/mdlaunch/vite.svg") { event.request.uri = "/vite.svg"; }`,
+            `if (event.request.uri === "/mdlaunch/ambassador_card_image.png") { event.request.uri = "/ambassador_card_image.png"; }`,
+            `if (event.request.uri === "/mdlaunch/premier_card_image.png") { event.request.uri = "/premier_card_image.png"; }`,
           ].join(" "),
         },
       },

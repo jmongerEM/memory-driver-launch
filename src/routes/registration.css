@@ -1,7 +1,14 @@
 /* Registration page – same layout as home (header/footer from index.css), form-specific styles */
+.home-page .registration-main {
+  padding: 2rem 1.5rem 3rem;
+  box-sizing: border-box;
+}
+
 .registration-main .registration-inner {
   max-width: 560px;
   margin: 0 auto;
+  padding: 2rem 0;
+  box-sizing: border-box;
 }
 
 .registration-title {
@@ -25,6 +32,13 @@
   line-height: 1.6;
   color: var(--evon-text-muted);
   margin: 0 0 1.5rem;
+}
+
+.registration-step-indicator {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--evon-text-muted);
+  margin: 0 0 1rem;
 }
 
 .registration-label {
@@ -77,8 +91,14 @@
 .registration-form input:focus,
 .registration-form select:focus,
 .registration-form textarea:focus {
-  outline: none;
   border-color: var(--evon-accent);
+}
+
+.registration-form input:focus-visible,
+.registration-form select:focus-visible,
+.registration-form textarea:focus-visible {
+  outline: 3px solid var(--evon-focus-ring);
+  outline-offset: 2px;
 }
 
 .registration-form input.error,
@@ -125,12 +145,17 @@
   flex-wrap: wrap;
 }
 
+/* Secondary action (e.g. Back) – outline style so primary CTA stays dominant */
 .registration-form .submit-wrap .cta-button-secondary {
-  background-color: var(--evon-navy);
+  background-color: transparent;
+  color: var(--evon-navy);
+  border: 2px solid var(--evon-button);
 }
 
 .registration-form .submit-wrap .cta-button-secondary:hover {
-  background-color: #0a2842;
+  background-color: var(--evon-border);
+  border-color: var(--evon-button-hover);
+  color: var(--evon-button-hover);
 }
 
 .registration-form .social-links-group {
@@ -152,13 +177,27 @@
 }
 
 .registration-back-link:focus-visible {
-  outline: 2px solid var(--evon-accent);
-  outline-offset: 4px;
+  outline: 3px solid var(--evon-focus-ring);
+  outline-offset: 2px;
 }
 
 .registration-success {
   text-align: center;
   padding: 2rem 0;
+}
+
+.registration-success-icon {
+  display: block;
+  color: var(--evon-accent);
+  margin: 0 auto 1rem;
+  line-height: 0;
+}
+
+.registration-success-icon svg {
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
 }
 
 .registration-success h2 {
@@ -169,7 +208,8 @@
   line-height: 1.3;
 }
 
-.registration-success p {
+.registration-success p,
+.registration-success .registration-success-message {
   font-size: 1rem;
   color: var(--evon-text-muted);
   margin: 0 0 1.5rem;

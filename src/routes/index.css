@@ -2,6 +2,8 @@
 :root {
   --evon-navy: #091F38;
   --evon-accent: #D4480D;
+  --evon-button: #2563eb;
+  --evon-button-hover: #1d4ed8;
   --evon-bg: #ffffff;
   --evon-text: #091F38;
   --evon-text-muted: #3d5a6c;
@@ -23,6 +25,17 @@ body {
   min-width: 320px;
   min-height: 100vh;
   font-size: 16px;
+}
+
+/* Global keyboard focus ring – WCAG 2.4.7 Focus Visible */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible {
+  outline: 3px solid var(--evon-focus-ring);
+  outline-offset: 2px;
 }
 
 .skip-link {
@@ -56,7 +69,7 @@ body {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem 3rem;
+  padding: 0 1.25rem 2rem;
   box-sizing: border-box;
 }
 
@@ -83,8 +96,8 @@ body {
 }
 
 .home-header .logo:focus-visible {
-  outline: 2px solid var(--evon-accent);
-  outline-offset: 4px;
+  outline: 3px solid var(--evon-focus-ring);
+  outline-offset: 2px;
 }
 
 /* Promo sections – Memory Driver Premier & Ambassador Program (matching cards) */
@@ -94,7 +107,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  padding: 3rem 0;
+  padding: 2rem 0;
 }
 
 .promo-section:not(:first-child) {
@@ -126,6 +139,36 @@ body {
   line-height: 1.6;
 }
 
+/* Premier & Ambassador image slots – no card; layout slot only; title above image */
+.promo-image-slot {
+  flex: 1 1 280px;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.promo-image-title {
+  text-align: center;
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--evon-navy);
+  margin: 0 0 0.75rem;
+  line-height: 1.3;
+}
+
+.promo-image-slot .ambassador-card-image,
+.promo-image-slot .premier-card-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 320px;
+  max-height: 220px;
+  object-fit: contain;
+  object-position: center;
+}
+
 .promo-cta {
   flex: 1 1 280px;
   max-width: 360px;
@@ -137,7 +180,7 @@ body {
   text-align: center;
 }
 
-/* CTA buttons – thumb-friendly, accent orange */
+/* CTA buttons – thumb-friendly, lighter blue (site palette) */
 .cta-button {
   display: inline-flex;
   align-items: center;
@@ -148,7 +191,7 @@ body {
   font-size: 1.125rem;
   font-weight: 600;
   color: #ffffff;
-  background-color: var(--evon-accent);
+  background-color: var(--evon-button);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -158,7 +201,7 @@ body {
 }
 
 .cta-button:hover {
-  background-color: #b83d0b;
+  background-color: var(--evon-button-hover);
 }
 
 .cta-button:active {
@@ -166,8 +209,8 @@ body {
 }
 
 .cta-button:focus-visible {
-  outline: 2px solid var(--evon-navy);
-  outline-offset: 4px;
+  outline: 3px solid var(--evon-focus-ring);
+  outline-offset: 2px;
 }
 
 
@@ -182,6 +225,7 @@ body {
 .home-footer-inner {
   max-width: 1200px;
   margin: 0 auto;
+  text-align: center;
 }
 
 .home-footer-link {
@@ -195,20 +239,61 @@ body {
 }
 
 .home-footer-link:focus-visible {
-  outline: 2px solid var(--evon-accent);
-  outline-offset: 4px;
+  outline: 3px solid var(--evon-focus-ring);
+  outline-offset: 2px;
 }
 
 /* Responsive – stack everything in one column on small screens */
 @media (max-width: 640px) {
   .promo-section {
     flex-direction: column;
-    padding: 2rem 0;
+    padding: 1.5rem 0;
   }
 
   .promo-card {
     max-width: 100%;
   }
+
+  .promo-image-slot {
+    max-width: 100%;
+  }
+}
+
+/* 404 / Not found – uses design system tokens */
+.not-found-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  font-family: inherit;
+}
+
+.not-found-page h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--evon-navy);
+  margin: 0 0 1rem;
+  line-height: 1.3;
+}
+
+.not-found-page p {
+  font-size: 1rem;
+  color: var(--evon-text-muted);
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
+
+.not-found-page a {
+  font-size: 1rem;
+  color: var(--evon-navy);
+  text-decoration: underline;
+}
+
+.not-found-page a:hover {
+  color: var(--evon-accent);
 }
 
 /* High contrast / reduced motion */
