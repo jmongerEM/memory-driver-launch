@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { createFileRoute, Link, useNavigate, useLocation } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
 import { submitRegistrationForm } from '../api.form'
 import './index.css'
 import './registration.css'
@@ -10,8 +10,19 @@ export const Route = createFileRoute('/registration')({
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+interface RestoredRegistrationForm {
+  name: string
+  email: string
+  country: string
+  state: string
+  phone: string
+  referralSource: string
+  isAmbassador: boolean
+}
+
 function RegistrationPage() {
-  const [success, setSuccess] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState({
@@ -24,6 +35,20 @@ function RegistrationPage() {
     isAmbassador: false,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    const restored = (location.state as { restoredRegistrationForm?: RestoredRegistrationForm } | undefined)?.restoredRegistrationForm
+    if (!restored) return
+    setForm({
+      name: restored.name ?? '',
+      email: restored.email ?? '',
+      country: restored.country ?? '',
+      state: restored.state ?? '',
+      phone: restored.phone ?? '',
+      referralSource: restored.referralSource ?? '',
+      isAmbassador: restored.isAmbassador ?? true,
+    })
+  }, [location.state])
 
   const validateField = (name: string, value: string | boolean): string => {
     switch (name) {
@@ -79,6 +104,24 @@ function RegistrationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSubmitError(null)
+    if (form.isAmbassador) {
+      navigate({
+        to: '/ambassador/register',
+        search: { step: 2, from: 'registration' },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        state: {
+          registrationForm: {
+            name: form.name.trim(),
+            email: form.email.trim(),
+            country: form.country.trim(),
+            state: form.state.trim(),
+            phone: form.phone.trim(),
+            referralSource: form.referralSource.trim(),
+          },
+        } as any,
+      })
+      return
+    }
     if (!validateForm()) return
     setSubmitting(true)
     try {
@@ -93,7 +136,7 @@ function RegistrationPage() {
           isAmbassador: form.isAmbassador,
         },
       })
-      setSuccess(true)
+      navigate({ to: '/success' })
     } catch {
       setSubmitError('Registration could not be completed. Please try again.')
     } finally {
@@ -101,15 +144,7 @@ function RegistrationPage() {
     }
   }
 
-  const formContent = success ? (
-    <div className="registration-success">
-      <h2>Registration Successful!</h2>
-      <p>Thank you for registering. We have received your information.</p>
-      <Link to="/" className="registration-back-link">
-        Return to home
-      </Link>
-    </div>
-  ) : (
+  const formContent = (
     <>
       <p className="registration-instructions">
         Complete the form below to register. Fields marked with an asterisk (*) are required. 
@@ -266,7 +301,7 @@ function RegistrationPage() {
             disabled={submitting}
             aria-busy={submitting}
           >
-            {submitting ? 'Registering…' : 'Register'}
+            {submitting ? 'Registering…' : form.isAmbassador ? 'Sign Up!' : 'Register'}
           </button>
         </div>
       </form>

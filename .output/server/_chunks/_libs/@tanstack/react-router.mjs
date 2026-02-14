@@ -1135,6 +1135,11 @@ if (typeof globalThis !== "undefined") {
   window.createFileRoute = createFileRoute;
   window.createLazyFileRoute = createLazyFileRoute;
 }
+function useLocation(opts) {
+  return useRouterState({
+    select: (state) => state.location
+  });
+}
 function Asset({
   tag,
   attrs,
@@ -1471,6 +1476,7 @@ export {
   createRootRoute as a,
   createFileRoute as b,
   createRouter as c,
+  useLocation as d,
   lazyRouteComponent as l,
   renderRouterToStream as r,
   useNavigate as u

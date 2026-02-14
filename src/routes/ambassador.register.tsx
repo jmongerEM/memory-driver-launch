@@ -1,12 +1,14 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
+import { createFileRoute, Link, useNavigate, useLocation } from '@tanstack/react-router'
+import { useEffect, useRef, useState } from 'react'
+import { z } from 'zod'
 import { submitAmbassadorRegistrationForm } from '../api.form'
 import './index.css'
 import './registration.css'
 
 export const Route = createFileRoute('/ambassador/register')({
-  validateSearch: (search: Record<string, unknown>) => ({
-    step: search.step === 2 || search.step === '2' ? 2 : 1,
+  validateSearch: z.object({
+    step: z.coerce.number().catch(1),
+    from: z.string().optional(),
   }),
   component: AmbassadorRegisterPage,
 })
@@ -16,11 +18,21 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const STEP_1 = 1
 const STEP_2 = 2
 
+interface RegistrationFormState {
+  name: string
+  email: string
+  country: string
+  state: string
+  phone: string
+  referralSource: string
+}
+
 function AmbassadorRegisterPage() {
   const navigate = useNavigate()
-  const { step: urlStep } = Route.useSearch()
+  const location = useLocation()
+  const { step: urlStep, from } = Route.useSearch()
   const step = urlStep === 2 ? STEP_2 : STEP_1
-  const [success, setSuccess] = useState(false)
+  const hasAppliedRegistrationState = useRef(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState({
@@ -44,6 +56,22 @@ function AmbassadorRegisterPage() {
   const [showValidationPopup, setShowValidationPopup] = useState(false)
   /** Messages to show in the validation popup (set when opening popup so popup doesn't depend on errors timing) */
   const [validationPopupMessages, setValidationPopupMessages] = useState<string[]>([])
+
+  useEffect(() => {
+    if (step !== STEP_2 || from !== 'registration' || hasAppliedRegistrationState.current) return
+    const registrationForm = (location.state as { registrationForm?: RegistrationFormState } | undefined)?.registrationForm
+    if (!registrationForm) return
+    hasAppliedRegistrationState.current = true
+    setForm((prev) => ({
+      ...prev,
+      name: registrationForm.name || prev.name,
+      email: registrationForm.email || prev.email,
+      country: registrationForm.country || prev.country,
+      state: registrationForm.state || prev.state,
+      phone: registrationForm.phone || prev.phone,
+      howDidYouHear: registrationForm.referralSource || prev.howDidYouHear,
+    }))
+  }, [step, from, location.state])
 
   const validateField = (name: string, value: string): string => {
     switch (name) {
@@ -109,7 +137,7 @@ function AmbassadorRegisterPage() {
     setValidationPopupMessages([])
     navigate({
       to: '/ambassador/register',
-      search: { step: 2 },
+      search: (prev) => ({ ...prev, step: 2 }),
       replace: true,
     })
   }
@@ -125,11 +153,30 @@ function AmbassadorRegisterPage() {
     e.preventDefault()
     setSubmitError(null)
     setStep1BlockedMessage(null)
-    navigate({
-      to: '/ambassador/register',
-      search: { step: 1 },
-      replace: true,
-    })
+    if (from === 'registration') {
+      navigate({
+        to: '/registration',
+        replace: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        state: {
+          restoredRegistrationForm: {
+            name: form.name,
+            email: form.email,
+            country: form.country,
+            state: form.state,
+            phone: form.phone,
+            referralSource: form.howDidYouHear,
+            isAmbassador: true,
+          },
+        } as any,
+      })
+    } else {
+      navigate({
+        to: '/ambassador/register',
+        search: (prev) => ({ ...prev, step: 1 }),
+        replace: true,
+      })
+    }
   }
 
   const submitRegistration = async () => {
@@ -161,7 +208,7 @@ function AmbassadorRegisterPage() {
           conflictsOfInterest: form.conflictsOfInterest.trim() || undefined,
         },
       })
-      setSuccess(true)
+      navigate({ to: '/ambassador/success' })
     } catch {
       setSubmitError('Registration could not be completed. Please check your connection and try again. If the problem persists, save your information and contact support.')
     } finally {
@@ -174,33 +221,6 @@ function AmbassadorRegisterPage() {
     e.stopPropagation()
     void submitRegistration()
     return false
-  }
-
-  if (success) {
-    return (
-      <div className="home-page" role="document">
-        <a href="#main-content" className="skip-link">Skip to main content</a>
-        <header className="home-header" role="banner">
-          <Link to="/" className="logo" aria-label="Memory Driver – home">
-            <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="Memory Driver" width="220" height="220" />
-          </Link>
-        </header>
-        <main id="main-content" role="main" className="registration-main">
-          <div className="registration-inner">
-            <div className="registration-success">
-              <h2>Registration Successful!</h2>
-              <p>Thank you for registering for the Ambassador Program. We have received your information and will be in touch soon.</p>
-              <Link to="/" className="registration-back-link">Return to home</Link>
-            </div>
-          </div>
-        </main>
-        <footer className="home-footer" role="contentinfo">
-          <div className="home-footer-inner">
-            <a href="https://evonmedics.com/memory-driver/" target="_blank" rel="noopener noreferrer" className="home-footer-link">Memory Driver</a>
-          </div>
-        </footer>
-      </div>
-    )
   }
 
   if (step === STEP_1) {
@@ -291,7 +311,7 @@ function AmbassadorRegisterPage() {
                 </button>
               </div>
             </form>
-            <Link to="/" className="registration-back-link">← Back to home</Link>
+            <Link to="/registration" className="registration-back-link">← Back</Link>
           </div>
         </main>
         <footer className="home-footer" role="contentinfo">
